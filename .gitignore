@@ -1,0 +1,4 @@
+buddy_test.c
+.vscode/
+*.o
+*.exe

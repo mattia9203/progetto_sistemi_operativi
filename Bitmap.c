@@ -16,20 +16,20 @@ void BitMap_init(BitMap* bitmap, int num_bits, char* buf){
 
 //funzione per settare il num_bit nella bitmap a value(0 o 1)
 void BitMap_setBit(BitMap* bitmap, int num_bit, int value){
-    int num_byte = num_bit/8;
+    int num_byte = num_bit>>3;
     assert(num_byte < bitmap->buffer_size);
-    int bit = num_byte&0x03;
+    int bit = num_bit&0x07;
     if(value){
         bitmap->buffer[num_byte] |= (1<<bit);    //setta bit a 1
     }
     else{
-        bitmap->buffer[num_byte] &= (1<<bit);    //setta bit a 0
+        bitmap->buffer[num_byte] &= ~(1<<bit);    //setta bit a 0
     }
 }
 //funzione che ritorna 1 se bit 1 o 0 altrimenti
-int BitMap_getBit(BitMap* bitmap, int num_bit){
-    int num_byte = num_bit/8;
+int BitMap_getBit(const BitMap* bitmap, int num_bit){
+    int num_byte = num_bit>>3;             
     assert(num_byte < bitmap->buffer_size);
-    int bit = num_byte&0x03;
+    int bit = num_bit&0x07;
     return (bitmap->buffer[num_byte] & (1<<bit)) != 0;
 }

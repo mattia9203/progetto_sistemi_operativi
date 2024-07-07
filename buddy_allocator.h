@@ -22,3 +22,5 @@ void BuddyAllocator_free(BuddyAllocator* alloc,void* mem);
 void set_successors_and_predecessors(BitMap* bitmap,int idx, int value,int succ);    //setta i successori se succ=1 e i predecessori su succ=0 di num_bit a value
 
 void release_mem(BitMap* bitmap,int idx_free);         //funzione che libera la memoria controllando se buddy libero così da riunire i buddy 
+
+void Bitmap_print(BitMap *bit_map);

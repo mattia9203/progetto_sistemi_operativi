@@ -12,4 +12,4 @@ void BitMap_init(BitMap* bit_map, int num_bits, char* buffer);  //funzione che c
 
 void BitMap_setBit(BitMap* bit_map, int bit_num, int status);   //set il #bit_num bit della bitmap(ovviamente 0 o 1)
 
-int BitMap_getBit(BitMap* bit_map, int bit_num);    //analizza il bit bit_num
+int BitMap_getBit(const BitMap* bit_map, int bit_num);    //analizza il bit bit_num
