@@ -114,7 +114,7 @@ void* BuddyAllocator_malloc(BuddyAllocator* alloc,int size){
     //Bitmap_print(&alloc->bitmap);
 
     //return (void*)(block+sizeof(int));
-    return (void*) (block + sizeof(int));
+    return (void*) (block + 2*sizeof(int));
 
 }
 
@@ -125,7 +125,11 @@ void BuddyAllocator_free(BuddyAllocator* alloc, void* block){
     }
     //possiamo ora ritrovare l'indice avendolo inserito in precedenza prima dell'indirizzo
     int *p = (int*)block;
-    int idx_free =p[-1];
+    p--;
+    int size = *p;
+    printf("%d",size);
+    p--;
+    int idx_free = *p;
     
     printf("\nINDICE DA LIBERARE %d\n",idx_free);
     //bisogna verificare che il blocco sia stato rilasciato dal buddy vedendo se puntatore allineato
