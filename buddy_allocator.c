@@ -40,7 +40,10 @@ void BuddyAllocator_init(BuddyAllocator* alloc, int num_levels, char* buf, int b
     int bits = (1 << (num_levels+1))-1;           //bit necessari per bitmap(=2^(num_levels+1))-1
     int bitmap_size = BitMap_getBytes(bits);
 
-    assert("MEMORIA NON ABBASTANZA GRANDE PER CONTENERE BITMAP" && bitmap_buf_size>=BitMap_getBytes(bits));
+    assert("\nERRORE INIT: MEMORIA NON ABBASTANZA GRANDE PER CONTENERE BITMAP\n" && bitmap_buf_size>=BitMap_getBytes(bits));
+    assert("\nERRORE INIT: BUFFER PUNTA A NULL\n" && buf);
+    assert("\nERRORE INIT: BUF SIZE DEVE ESSERE >0\n" && buf_size>0);
+    assert("\nERRORE INIT: MEMORIA PER LA BITMAP NULL\n" && bitmap_buf);
 
     if (!is_power_of_two(buf_size)){
         buf_size = min_bucket_size << num_levels;       //se dimensione non è potenza di due allora non usiamo tutta la memoria ma solo buf_size = min_bucket_size * 2^num_levels
@@ -58,13 +61,14 @@ void BuddyAllocator_init(BuddyAllocator* alloc, int num_levels, char* buf, int b
 }
 
 void* BuddyAllocator_malloc(BuddyAllocator* alloc,int size){
-    if (size == 0){
-        printf("INSERIRE SIZE DIVERSA DA 0\n");
+    if (size <= 0){
+        printf("INSERIRE SIZE MAGGIORE DI 0\n");
         return NULL;
     }
 
     if (size+2*sizeof(int) > alloc->buf_size) {
         printf("NON ABBASTANZA MEMORIA PER SODDISFARE LA RICHIESTA DI %d bytes\n",size);
+        return NULL;
     }
 
     
@@ -85,7 +89,6 @@ void* BuddyAllocator_malloc(BuddyAllocator* alloc,int size){
     } else{
         //se il livello non è il primo allora avremo piu indici per quel livello e quindi ci servirà un ciclo per controllarli
         for (int i = first(level); i < first(level+1); i++){
-            printf (" %d ",i);
             if (!BitMap_getBit(&alloc->bitmap,i)){
                 idx_free = i;
                 printf("INDICE LIBERO : %d\n",idx_free);
@@ -127,11 +130,10 @@ void BuddyAllocator_free(BuddyAllocator* alloc, void* block){
     int *p = (int*)block;
     p--;
     int size = *p;
-    printf("%d",size);
     p--;
     int idx_free = *p;
     
-    printf("\nINDICE DA LIBERARE %d\n",idx_free);
+    printf("\nINDICE DA LIBERARE %d\nSTART : %p\n",idx_free,block);
     //bisogna verificare che il blocco sia stato rilasciato dal buddy vedendo se puntatore allineato
     //controlliamo anche il caso in cui si faccia la free su un blocco libero cosi da evitare double free
     if (BitMap_getBit(&alloc->bitmap,idx_free) == 0){
