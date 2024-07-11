@@ -23,4 +23,3 @@ void set_successors_and_predecessors(BitMap* bitmap,int idx, int value,int succ)
 
 void release_mem(BitMap* bitmap,int idx_free);         //funzione che libera la memoria controllando se buddy libero così da riunire i buddy 
 
-void Bitmap_print(BitMap *bit_map);

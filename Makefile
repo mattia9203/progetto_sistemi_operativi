@@ -4,7 +4,7 @@ AR=ar
 
 OBJS=Bitmap.o\
      buddy_allocator.o\
-	 main_malloc.o\
+	 main_malloc.o
 
 HEADERS=Bitmap.h buddy_allocator.h main_malloc.h
 
@@ -24,9 +24,11 @@ libbuddy.a: $(OBJS)
 	$(AR) -rcs $@ $^
 	$(RM) $(OBJS)
 
-buddy_test: buddy_test.o $(LIBS)
-	$(CC) $(CCOPTS) -o $@ $^ -lm
+
 main_test: main_test.o $(LIBS)
+	$(CC) $(CCOPTS) -o $@ $^ -lm
+	
+buddy_test: buddy_test.o $(LIBS)
 	$(CC) $(CCOPTS) -o $@ $^ -lm
 
 clean:

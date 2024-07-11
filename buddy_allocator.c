@@ -112,8 +112,7 @@ void* BuddyAllocator_malloc(BuddyAllocator* alloc,int size){
     set_successors_and_predecessors (&alloc->bitmap,idx_free,1,1);     //successori
     set_successors_and_predecessors (&alloc->bitmap,idx_free,1,0);     //predecessori
     printf("\nALLOCATO BLOCCO DI MEMORIA DI DIMENSIONE %d bytes AL LIVELLO %d CON INDICE BITMAP %d\n",size,level,idx_free);
-    printf("\nSTART : %p\n\n",block+2*sizeof(int));
-
+    
     //Bitmap_print(&alloc->bitmap);
 
     //return (void*)(block+sizeof(int));
@@ -129,11 +128,10 @@ void BuddyAllocator_free(BuddyAllocator* alloc, void* block){
     //possiamo ora ritrovare l'indice avendolo inserito in precedenza prima dell'indirizzo
     int *p = (int*)block;
     p--;
-    int size = *p;
     p--;
     int idx_free = *p;
     
-    printf("\nINDICE DA LIBERARE %d\nSTART : %p\n",idx_free,block);
+    printf("\nINDICE DA LIBERARE %d\n",idx_free);
     //bisogna verificare che il blocco sia stato rilasciato dal buddy vedendo se puntatore allineato
     //controlliamo anche il caso in cui si faccia la free su un blocco libero cosi da evitare double free
     if (BitMap_getBit(&alloc->bitmap,idx_free) == 0){
@@ -176,29 +174,3 @@ void release_mem(BitMap* bitmap,int idx){
     }else printf("\nBUDDY DI %d : %d NON LIBERO, QUINDI NIENTE OPERAZIONE DI MERGE\n",idx,buddy_idx);
 
 }
-
-void Bitmap_print(BitMap *bit_map){
-    int remain_to_print = 0;
-    int lvl = -1; 
-    int tot = levelIdx(bit_map->num_bits) - 1;  //numero di livelli totale
-    for (int i = 0; i < bit_map->num_bits; i++){  
-        if (remain_to_print == 0){ //se non rimangono bit da stampare al livello lvl
-            if(lvl==tot){ //se siamo arrivati all'ultimo livello stop
-              break;
-            } 
-            printf("\n\033[93mLivello %d: \t\033[0m", ++lvl);     //indice del primo elemento del livello: i
-            for (int j = 0; j < (1 << tot) - (1 << lvl); j++){   //stampa degli spazi dopo aver scritto "Livello x:"
-              printf(" "); //stampa spazi
-            } 
-            remain_to_print = 1 << lvl; //al prossimo livello dovremo stampare 2^lvl bit
-        }
-        if (BitMap_getBit(bit_map, i)==0){ //se il blocco è 0 lo stampiamo verde
-          printf("\033[32m%d\033[0m ", BitMap_getBit(bit_map, i));
-        }
-        else{   //altrimenti lo stampiamo rosso
-          printf("\033[31m%d\033[0m ", BitMap_getBit(bit_map, i));
-        }
-        remain_to_print--;  //1 bit in meno da stampare
-    }
-    printf("\n");
-};
