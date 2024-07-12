@@ -41,7 +41,7 @@ void pseudo_free(BuddyAllocator* alloc,void** block){
         printf("\nBLOCCO NON ALLOCATO, MEMORIA PUNTA A NULL\n\n");
         return;
     }
-    int page_size = sysconf(_SC_PAGESIZE);
+    int page_size = sysconf(_SC_PAGESIZE);                            //funzione di sistema che restituisce la dimensione della pagina di memoria in bytes
     int *p = (int*)(*block);
     int size = *(p - 1);
     if (size <= 0.25*page_size){

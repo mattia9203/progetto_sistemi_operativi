@@ -7,8 +7,8 @@
 #include <sys/mman.h>
 
 #define BUFFER_SIZE (1024*1024)           //1MB di memoria
-#define NUM_LEVELS 16
-#define MEMORY_SIZE 1<<14                 //memoria per bitmap                                               
+#define NUM_LEVELS 17
+#define MEMORY_SIZE 1<<15                 //memoria per bitmap                                               
 #define MIN_BUCKET_SIZE (BUFFER_SIZE>>(NUM_LEVELS))
 
 char buffer[BUFFER_SIZE];

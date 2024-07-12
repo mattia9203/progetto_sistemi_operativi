@@ -111,7 +111,7 @@ void* BuddyAllocator_malloc(BuddyAllocator* alloc,int size){
     //ora aggiorniamo la bitmap settando a 1 tutti i successori e i predecessori dell'indice
     set_successors_and_predecessors (&alloc->bitmap,idx_free,1,1);     //successori
     set_successors_and_predecessors (&alloc->bitmap,idx_free,1,0);     //predecessori
-    printf("\nALLOCATO BLOCCO DI MEMORIA DI DIMENSIONE %d bytes AL LIVELLO %d CON INDICE BITMAP %d\n",size,level,idx_free);
+    printf("\nALLOCATO BLOCCO DI MEMORIA %p DI DIMENSIONE %d bytes AL LIVELLO %d CON INDICE BITMAP %d\n",block+2*sizeof(int),size,level,idx_free);
     
     //Bitmap_print(&alloc->bitmap);
 
@@ -128,24 +128,21 @@ void BuddyAllocator_free(BuddyAllocator* alloc, void* block){
     //possiamo ora ritrovare l'indice avendolo inserito in precedenza prima dell'indirizzo
     int *p = (int*)block;
     p--;
+    //int size = *p;
     p--;
     int idx_free = *p;
-    
-    printf("\nINDICE DA LIBERARE %d\n",idx_free);
-    //bisogna verificare che il blocco sia stato rilasciato dal buddy vedendo se puntatore allineato
-    //controlliamo anche il caso in cui si faccia la free su un blocco libero cosi da evitare double free
-    if (BitMap_getBit(&alloc->bitmap,idx_free) == 0){
+    if (BitMap_getBit(&alloc->bitmap,idx_free) == 0){                      //controllo sul double free
         printf("\nINDICE LIBERO : DOUBLE FREE\n");
         return;
     }
-
+    printf("\nBLOCCO DA LIBERARE: %p E INDICE BITMAP DA LIBERARE: %d",block,idx_free);
+    
     BitMap_setBit(&alloc->bitmap,idx_free,0);
-    //ora settiamo a 0 i discendenti che avevamo settato a 1 quando abbiamo rilasciato i blocco
+    //ora settiamo a 0 i discendenti che avevamo settato a 1 quando abbiamo rilasciato il blocco
     set_successors_and_predecessors(&alloc->bitmap,idx_free,0,1);
     release_mem(&alloc->bitmap,idx_free);       //funzione in cui controlliamo se buddy libero cosi da unirli e farlo ricorsivamente fino al livello più alto possibile
     printf("\nBLOCCO LIBERATO\n\n");
 
-    //Bitmap_print(&alloc->bitmap);
 
     return;
 }
@@ -164,8 +161,8 @@ void set_successors_and_predecessors(BitMap* bitmap,int idx,int value,int succ){
 }
 
 void release_mem(BitMap* bitmap,int idx){
-    if (idx == 0) return;    
-    int buddy_idx = buddy(idx);                    //root
+    if (idx == 0) return;                        //root non ha il buddy
+    int buddy_idx = buddy(idx);                    
     if (!BitMap_getBit(bitmap,buddy_idx)){         //buddy libero?
         printf("\nBUDDY DI %d : %d LIBERO\n",idx,buddy_idx);
         printf("\nDATO CHE BUDDY LIBERO ESEGUIAMO MERGE AL LIVELLO %d\n",levelIdx(idx));
