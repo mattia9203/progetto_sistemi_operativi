@@ -15,10 +15,10 @@ void BitMap_init(BitMap* bitmap, int num_bits, char* buf){
 }
 
 //funzione per settare il num_bit nella bitmap a value(0 o 1)
-void BitMap_setBit(BitMap* bitmap, int num_bit, int value){
-    int num_byte = num_bit>>3;                 //num_byte = num_bit/8,calcola byte della bitmap che contiene il bit che ci interessa 
+void BitMap_setBit(BitMap* bitmap, int idx, int value){
+    int num_byte = idx>>3;                 //num_byte = idx/8,calcola byte della bitmap che contiene il bit che ci interessa 
     assert(num_byte < bitmap->buffer_size);
-    int bit = num_bit&0x07;                    //trova la posizione del bit all'interno del byte -> num_bit%8
+    int bit = idx&0x07;                    //trova la posizione del bit all'interno del byte -> num_bit%8
     if(value){
         bitmap->buffer[num_byte] |= (1<<bit);    //setta bit a 1 utilizzando l'OR bit a bit
     }
@@ -27,9 +27,9 @@ void BitMap_setBit(BitMap* bitmap, int num_bit, int value){
     }
 }
 //funzione che ritorna 1 se bit 1 o 0 altrimenti
-int BitMap_getBit(const BitMap* bitmap, int num_bit){
-    int num_byte = num_bit>>3;                  //calcola byte della bitmap che contiene il bit che ci interessa       
+int BitMap_getBit(const BitMap* bitmap, int idx){
+    int num_byte = idx>>3;                  //calcola byte della bitmap che contiene il bit che ci interessa       
     assert(num_byte < bitmap->buffer_size);
-    int bit = num_bit&0x07;
+    int bit = idx&0x07;
     return (bitmap->buffer[num_byte] & (1<<bit)) != 0;         //ritorna 1 se bit 1 e 0 altrimenti, attraverso l'AND bit a bit
 }
