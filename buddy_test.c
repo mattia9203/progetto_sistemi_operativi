@@ -6,9 +6,10 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#define BUFFER_SIZE (1024*1024)           //1MB di memoria
+#define BUFFER_SIZE ((1024*1024))         //1MB di memoria
 #define NUM_LEVELS 17
-#define MEMORY_SIZE 1<<15                 //memoria per bitmap                                               
+#define PLUS_BITMAP (((1 << (NUM_LEVELS+1))-1)%8 != 0 ? 1 : 0)
+#define MEMORY_SIZE (((1 << (NUM_LEVELS+1))-1)/8)+PLUS_BITMAP             //memoria per bitmap                                               
 #define MIN_BUCKET_SIZE (BUFFER_SIZE>>(NUM_LEVELS))
 
 char buffer[BUFFER_SIZE];
@@ -17,18 +18,22 @@ char bitmap[MEMORY_SIZE];
 BuddyAllocator alloc;
 
 int main(int argc,char** argv){
-
+    
     BuddyAllocator_init(&alloc,NUM_LEVELS,buffer,BUFFER_SIZE,bitmap,MEMORY_SIZE,MIN_BUCKET_SIZE);
     
     //proviamo ad allocare blocchi maggiori di 1mb o minori di 0
     printf("Proviamo ad allocare blocchi troppo grandi o negativi per verificare la condizione sulla size\n");
     void* p1 = BuddyAllocator_malloc(&alloc,10000000);
 
-    printf("\n\n");
-
     void* p2 = BuddyAllocator_malloc(&alloc,-1);
 
-    char* blocks[20];
+    printf("Proviamo a deallocarli sapendo che l'allocazione non è andata a termine\n\n");
+    BuddyAllocator_free(&alloc,p1);
+    BuddyAllocator_free(&alloc,p2);
+
+    void* blocks[20];
+
+    printf("\n\n");
 
     printf("\nProviamo a riempire la memoria del buddy, allochiamo 4 blocchi al livello 2\n");
     for (int i=0; i<4; i++){
