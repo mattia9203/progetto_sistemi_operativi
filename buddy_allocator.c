@@ -72,7 +72,7 @@ void* BuddyAllocator_malloc(BuddyAllocator* alloc,int size){
     }
 
     
-    size+=2*sizeof(int);               //bisogna tener conto dei byte usati per l'indice della bitmap
+    size+=sizeof(int);               //bisogna tener conto dei byte usati per l'indice della bitmap
 
     int level =(int) (floor(log2(alloc->buf_size / size)));
     if (level > alloc->num_levels ) level = alloc->num_levels;        //se livello troppo profondo assegnamo il massimo
@@ -105,15 +105,15 @@ void* BuddyAllocator_malloc(BuddyAllocator* alloc,int size){
     char* block = alloc->buf + start(idx_free) * dim_lvl;    
     //come visto a lezione, invece di passare soltanto l'indirizzo passiamo anche l'indice e la dimemsione del blocco, che ci sarà utile nella free
     ((int *)block)[0] = idx_free;
-    ((int *)block)[1] = size;
+    //((int *)block)[1] = size;
     
 
     //ora aggiorniamo la bitmap settando a 1 tutti i successori e i predecessori dell'indice
     set_successors_and_predecessors (&alloc->bitmap,idx_free,1,1);     //successori
     set_successors_and_predecessors (&alloc->bitmap,idx_free,1,0);     //predecessori
-    printf("\nALLOCATO BLOCCO DI MEMORIA %p DI DIMENSIONE %d bytes AL LIVELLO %d CON INDICE BITMAP %d\n",block+2*sizeof(int),size,level,idx_free);
+    printf("\nALLOCATO BLOCCO DI MEMORIA %p DI DIMENSIONE %d bytes AL LIVELLO %d CON INDICE BITMAP %d\n",block+sizeof(int),dim_lvl,level,idx_free);
     
-    return (void*) (block + 2*sizeof(int));
+    return (void*) (block + sizeof(int));
 }
 
 void BuddyAllocator_free(BuddyAllocator* alloc, void* block){
@@ -121,12 +121,12 @@ void BuddyAllocator_free(BuddyAllocator* alloc, void* block){
         printf("\nBLOCCO NON ALLOCATO\n");
         return;
     }
-    //possiamo ora ritrovare l'indice avendolo inserito in precedenza prima dell'indirizzo
     int *p = (int*)block;
     p--;
-    //int size = *p;
-    p--;
     int idx_free = *p;
+    int size = alloc->min_bucket_size * (1 << (alloc->num_levels - levelIdx(idx_free)));         //calcola la dimensione dei blocchi nel livello che ci interessa
+    printf("\nLIBERO BLOCCO COL BUDDY ALLOCATOR:%p di dimensione %d\n",block,size);
+    //possiamo ora ritrovare l'indice avendolo inserito in precedenza prima dell'indirizzo
     if (BitMap_getBit(&alloc->bitmap,idx_free) == 0){                      //controllo sul double free
         printf("\nINDICE LIBERO : DOUBLE FREE\n");
         return;
